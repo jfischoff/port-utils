@@ -1,4 +1,4 @@
-# wait-on-port
+# port-utilities
 
 This is very simple utility library to block excution until a port is ready for connections.
 
