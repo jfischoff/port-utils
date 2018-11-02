@@ -4,7 +4,7 @@ import qualified Control.Concurrent as C
 import qualified Control.Exception as E
 import qualified System.IO.Error as Error
 
--- | Open a TCP socket on a random free port. This is like 'Warp''s
+-- | Open a TCP socket on a random free port. This is like 'warp''s
 --   openFreePort.
 openFreePort :: IO (Int, N.Socket)
 openFreePort =
