@@ -2,11 +2,11 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2b2b2d389464694fe18dfdfb609364a249b47c190b3449d821a47b52a4022941
+-- hash: 72ebcc78c45908a456d0f8911c778ee2923c52782b34159bae0ff8ae49702dd4
 
 name:           wait-on-port
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/wait-on-port#readme>
+description:    A single function library which attempts to connect a port over and over again until it accepts a connection.
 homepage:       https://github.com/githubuser/wait-on-port#readme
 bug-reports:    https://github.com/githubuser/wait-on-port/issues
 author:         Author name here
@@ -26,36 +26,31 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Network.Socket.Wait
   other-modules:
       Paths_wait_on_port
   hs-source-dirs:
       src
+  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase
   build-depends:
       base >=4.7 && <5
-  default-language: Haskell2010
-
-executable wait-on-port-exe
-  main-is: Main.hs
-  other-modules:
-      Paths_wait_on_port
-  hs-source-dirs:
-      app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      base >=4.7 && <5
-    , wait-on-port
+    , network
   default-language: Haskell2010
 
 test-suite wait-on-port-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Tests.Network.Socket.WaitSpec
       Paths_wait_on_port
   hs-source-dirs:
       test
+  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , hspec
+    , network
+    , stm
     , wait-on-port
   default-language: Haskell2010

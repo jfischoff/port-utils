@@ -12,6 +12,11 @@ extra-source-files:
 
 description: A single function library which attempts to connect a port over and over again until it accepts a connection.
 
+default-extensions:
+- ScopedTypeVariables
+- RecordWildCards
+- LambdaCase
+
 dependencies:
 - base >= 4.7 && < 5
 - network
@@ -29,3 +34,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - wait-on-port
+    - hspec
+    - stm

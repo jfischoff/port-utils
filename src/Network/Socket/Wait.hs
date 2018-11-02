@@ -1,12 +1,14 @@
 module Network.Socket.Wait
   ( -- * Simple Api
     wait
-  , -- * Advanced Api
+    -- * Advanced Api
   , waitWith
   , EventHandlers (..)
+  , defaultDelay
   ) where
-import Network.Socket as S
-import Control.Concurrent
+import qualified Network.Socket as S
+import qualified Control.Concurrent as C
+import qualified Control.Exception as E
 
 -------------------------------------------------------------------------------
 -- Simple Api
@@ -31,11 +33,19 @@ wait :: String
      -> Int
      -- ^ Port
      -> IO ()
-wait = waitWith mempty 10000
+wait = waitWith mempty defaultDelay
 
 -------------------------------------------------------------------------------
 -- Advanced Api
 -------------------------------------------------------------------------------
+-- | The default delay between retries is 10000 microseconds (10 ms)
+defaultDelay :: Int
+defaultDelay = 10000
+
+-- | The 'EventHandlers' is a record of 'IO' actions that are called when
+--   interesting events occur in the lifecycle of the 'waitWith' loop.
+--   One can pass in custom 'EventHandlers' values to implement logging
+--   and other forms of instrumentations.
 data EventHandlers = EventHandlers
   { createdSocket :: IO ()
   -- ^ Called after the socket is created
@@ -46,19 +56,22 @@ data EventHandlers = EventHandlers
   -- ^ Called before a recursive call to restart the connection attempt
   }
 
-instance Monoid EventHandlers where
-  mempty  = EventHandlers mempty mempty mempty
-  mappend x y = EventHandlers = EventHandlers
+instance Semigroup EventHandlers where
+  x <> y = EventHandlers
     { createdSocket = createdSocket x <> createdSocket y
     , delaying      = delaying      x <> delaying      y
     , restarting    = restarting    x <> restarting    y
     }
 
+instance Monoid EventHandlers where
+  mempty  = EventHandlers mempty mempty mempty
+  mappend = (<>)
+
 -- | Advanced usage. In most situations calling 'wait' will suffice. This allows
 -- one to customize the delay between retries and debug the behavior of the
 -- function. 'wait' is defined as
 -- @
---  wait = waitWith mempty 10000
+--  wait = waitWith mempty defaultDelay
 -- @
 --
 -- Since 0.0.0.1
@@ -72,7 +85,7 @@ waitWith :: EventHandlers
          -- ^ Port
          -> IO ()
 waitWith eh@EventHandlers {..} delay host port = do
-  res <- try $ do
+  res <- E.try $ do
     let hints = S.defaultHints { S.addrFlags = [ S.AI_NUMERICHOST
                                                , S.AI_NUMERICSERV
                                                ]
@@ -80,7 +93,7 @@ waitWith eh@EventHandlers {..} delay host port = do
                                }
     -- getAddrInfo returns a non-empty array or throws per the doc
     addr:_ <- S.getAddrInfo (Just hints) (Just host) (Just $ show port)
-    bracket
+    E.bracket
       (S.socket (S.addrFamily addr) (S.addrSocketType addr) (S.addrProtocol addr))
       S.close
       $ \sock -> do
@@ -88,9 +101,9 @@ waitWith eh@EventHandlers {..} delay host port = do
         S.connect sock $ S.addrAddress addr
 
   case res of
-    Left (_ :: IOException) -> do
+    Left (_ :: E.IOException) -> do
       delaying
-      threadDelay delay
+      C.threadDelay delay
 
       restarting
       waitWith eh delay host port
