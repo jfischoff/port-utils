@@ -1,5 +1,17 @@
 # port-utilities
 
+## openFreePort
+
+This is another version of `warp`'s `openFreePort` function. Nice if you don't already depend on `warp`.
+
+`openFreePort` returns a socket on random port and the port it has been bound to.
+
+```haskell
+openFreePort :: IO (Int, Socket)
+```
+
+## wait
+
 This is very simple utility library to block excution until a port is ready for connections.
 
 Here is an example of the primary function:
