@@ -33,6 +33,7 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - wait-on-port
+    - async
     - hspec
     - stm
+    - wait-on-port

@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b604816636f21d5a5b61fc888363eb9143bb01de41d720e92375ac71e4a8216c
+-- hash: 2778dc4a4d51dde215ea2af5c207f6a4f66ba32c0e9a7ad207b203c487387159
 
 name:           wait-on-port
 version:        0.1.0.0
@@ -48,7 +48,8 @@ test-suite unit-test
   default-extensions: ScopedTypeVariables RecordWildCards LambdaCase
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      async
+    , base >=4.7 && <5
     , hspec
     , network
     , stm
