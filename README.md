@@ -12,7 +12,7 @@ openFreePort :: IO (Int, Socket)
 
 ## wait
 
-This is very simple utility library to block excution until a port is ready for connections.
+`wait` for attempt to connect to a host and port until successful.
 
 Here is an example of the primary function:
 
