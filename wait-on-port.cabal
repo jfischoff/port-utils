@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2778dc4a4d51dde215ea2af5c207f6a4f66ba32c0e9a7ad207b203c487387159
+-- hash: b5ddd119e7865c6b23fd082cf23ad7e9a80e797e048914d17126b2970240e800
 
 name:           wait-on-port
 version:        0.1.0.0
@@ -26,6 +26,7 @@ source-repository head
 
 library
   exposed-modules:
+      Network.Socket.Free
       Network.Socket.Wait
   other-modules:
       Paths_wait_on_port

@@ -1,5 +1,6 @@
 module Tests.Network.Socket.WaitSpec where
 import qualified Network.Socket.Wait as W
+import qualified Network.Socket.Free as F
 import qualified Network.Socket as N
 import qualified Control.Concurrent as C
 import qualified Control.Concurrent.STM as S
@@ -23,7 +24,7 @@ throwTimeout delay msg action = T.timeout delay action >>= \case
   Just x -> pure x
 
 spec :: H.Spec
-spec = H.before W.openFreePort $ H.after (N.close . snd) $ H.describe "wait" $ do
+spec = H.before F.openFreePort $ H.after (N.close . snd) $ H.describe "wait" $ do
   H.it "retries if a socket is not ready" $ \(port, sock) -> do
     -- There is a small race some what might connect to this
     N.close sock

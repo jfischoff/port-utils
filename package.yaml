@@ -1,4 +1,4 @@
-name:                wait-on-port
+name:                port-utils
 version:             0.1.0.0
 github:              "githubuser/wait-on-port"
 license:             BSD3
