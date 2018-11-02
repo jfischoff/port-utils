@@ -36,4 +36,4 @@ tests:
     - async
     - hspec
     - stm
-    - wait-on-port
+    - port-utils

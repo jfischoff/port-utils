@@ -20,8 +20,12 @@ import qualified Control.Exception as E
 --
 -- A typical use case is to call 'wait' in test code to wait for a server to
 -- start before trying to connect. For example:
+--
 -- @
---  wait "127.0.0.1" 7000
+--    void $ forkIO $ Warp.run 7000 app
+--    -- Wait for the server to start listening on the socket
+--    wait "127.0.0.1" 7000
+--    -- Communicate with the server
 -- @
 --
 -- If you would like to control the delay or understand how many connection
@@ -46,6 +50,17 @@ defaultDelay = 10000
 --   interesting events occur in the lifecycle of the 'waitWith' loop.
 --   One can pass in custom 'EventHandlers' values to implement logging
 --   and other forms of instrumentation.
+--
+--   For example for debug one could print out each step using:
+--
+-- @
+--    printHandlers = EventHandlers
+--      { createdSocket = putStrLn "createdSocket"
+--      , delaying      = putStrLn "delaying"
+--      , restarting    = putStrLn "restarting"
+--      }
+-- @
+--
 data EventHandlers = EventHandlers
   { createdSocket :: IO ()
   -- ^ Called after the socket is created
@@ -70,8 +85,9 @@ instance Monoid EventHandlers where
 -- | Advanced usage. In most situations calling 'wait' will suffice. This allows
 -- one to customize the delay between retries and debug the behavior of the
 -- function. 'wait' is defined as
+--
 -- @
---  wait = waitWith mempty defaultDelay
+--    wait = waitWith mempty defaultDelay
 -- @
 --
 -- Since 0.0.0.1

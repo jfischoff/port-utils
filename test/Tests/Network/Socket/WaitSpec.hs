@@ -36,7 +36,7 @@ spec = H.before F.openFreePort $ H.after (N.close . snd) $ H.describe "wait" $ d
         handlers = mempty { W.restarting = S.atomically $ S.modifyTVar' retryRef (+1) }
 
     let start = W.waitWith handlers W.defaultDelay "127.0.0.1" port
-    E.bracket (C.forkIOWithUnmask $ \restore -> restore start) C.killThread $ \_ ->
+    E.bracket (C.forkIO start) C.killThread $ \_ ->
       T.timeout
         (retryCount * W.defaultDelay * 10) -- wait more than long enough
         (S.atomically $ S.check . (==2) =<< S.readTVar retryRef) >>= \case
@@ -77,7 +77,7 @@ spec = H.before F.openFreePort $ H.after (N.close . snd) $ H.describe "wait" $ d
 
     let start = W.waitWith handlers W.defaultDelay "127.0.0.1" port
     throwTimeout 100000 "waiting for wait to return"
-      $ E.bracket (A.asyncWithUnmask $ \restore -> restore start) A.wait $ \_ -> do
+      $ E.bracket (A.async start) A.wait $ \_ -> do
         S.atomically $ S.check . (==Retried) =<< S.readTVar retryRef
 
         E.bracketOnError (N.socket N.AF_INET N.Stream N.defaultProtocol) N.close
