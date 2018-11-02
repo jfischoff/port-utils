@@ -19,7 +19,11 @@ Here is an example of the primary function:
 ```haskell
 import Network.Socket.Wait (wait)
 
+void $ forkIO $ Warp.run 7000 app
+-- Wait for the server to start listening on the socket
 wait "127.0.0.1" 7000
+-- Communicate with the server
+...
 ```
 
 This function will attempt to connect and delay 10 milliseconds and try again until it succeeds.
