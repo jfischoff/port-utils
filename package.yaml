@@ -1,16 +1,23 @@
 name:                port-utils
 version:             0.1.0.0
-github:              "githubuser/wait-on-port"
+github: jfischoff/port-utilities
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2018 Author name here"
+author:              "Jonathan Fischoff"
+maintainer:          "jonathangfischoff@gmail.com"
+copyright:           "2018 Jonathan Fischoff"
 
 extra-source-files:
 - README.md
 - ChangeLog.md
 
-description: A single function library which attempts to connect a port over and over again until it accepts a connection.
+synopsis: Utilities for creating and waiting on ports
+description:
+  Utilities for creating and waiting on ports.
+  .
+  @openFreePort@ will create a socket bound to a random free port will @warp@'s @openFreePort@
+  .
+  @wait@ will attempt to connect to given host and port until successful.
+  .
 
 default-extensions:
 - ScopedTypeVariables
