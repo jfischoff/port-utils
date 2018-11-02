@@ -12,7 +12,7 @@ openFreePort :: IO (Int, Socket)
 
 ## wait
 
-`wait` for attempt to connect to a host and port until successful.
+`wait` will attempt to connect to a host and port until successful. Between each unsuccessful attempt it sleeps for 10 ms
 
 Here is an example of the primary function:
 
@@ -25,8 +25,6 @@ wait "127.0.0.1" 7000
 -- Communicate with the server
 ...
 ```
-
-This function will attempt to connect and delay 10 milliseconds and try again until it succeeds.
 
 In bash one could write:
 
