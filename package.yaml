@@ -25,7 +25,7 @@ library:
   source-dirs: src
 
 tests:
-  wait-on-port-test:
+  unit-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:

@@ -1,14 +1,16 @@
 module Network.Socket.Wait
   ( -- * Simple Api
     wait
+  , openFreePort
     -- * Advanced Api
   , waitWith
   , EventHandlers (..)
   , defaultDelay
   ) where
-import qualified Network.Socket as S
+import qualified Network.Socket as N
 import qualified Control.Concurrent as C
 import qualified Control.Exception as E
+import qualified System.IO.Error as Error
 
 -------------------------------------------------------------------------------
 -- Simple Api
@@ -34,6 +36,21 @@ wait :: String
      -- ^ Port
      -> IO ()
 wait = waitWith mempty defaultDelay
+
+-- | Open a TCP socket on a random free port. This is like 'Warp''s
+--   openFreePort.
+openFreePort :: IO (Int, N.Socket)
+openFreePort =
+  E.bracketOnError (N.socket N.AF_INET N.Stream N.defaultProtocol) N.close
+    $ \sock -> N.getSocketName sock >>= \case
+      N.SockAddrInet port _ -> pure (fromIntegral port, sock)
+      addr -> E.throwIO
+        $ Error.mkIOError Error.userErrorType
+          (  "openFreePort was unable to create socket with a SockAddrInet. "
+          <> "Got " <> show addr
+          )
+          Nothing
+          Nothing
 
 -------------------------------------------------------------------------------
 -- Advanced Api
@@ -86,19 +103,15 @@ waitWith :: EventHandlers
          -> IO ()
 waitWith eh@EventHandlers {..} delay host port = do
   res <- E.try $ do
-    let hints = S.defaultHints { S.addrFlags = [ S.AI_NUMERICHOST
-                                               , S.AI_NUMERICSERV
-                                               ]
-                               , S.addrSocketType = S.Stream
-                               }
+    let hints = N.defaultHints { N.addrSocketType = N.Stream }
     -- getAddrInfo returns a non-empty array or throws per the doc
-    addr:_ <- S.getAddrInfo (Just hints) (Just host) (Just $ show port)
+    addr:_ <- N.getAddrInfo (Just hints) (Just host) (Just $ show port)
     E.bracket
-      (S.socket (S.addrFamily addr) (S.addrSocketType addr) (S.addrProtocol addr))
-      S.close
+      (N.socket (N.addrFamily addr) (N.addrSocketType addr) (N.addrProtocol addr))
+      N.close
       $ \sock -> do
         createdSocket
-        S.connect sock $ S.addrAddress addr
+        N.connect sock $ N.addrAddress addr
 
   case res of
     Left (_ :: E.IOException) -> do

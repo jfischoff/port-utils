@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 72ebcc78c45908a456d0f8911c778ee2923c52782b34159bae0ff8ae49702dd4
+-- hash: b604816636f21d5a5b61fc888363eb9143bb01de41d720e92375ac71e4a8216c
 
 name:           wait-on-port
 version:        0.1.0.0
@@ -37,7 +37,7 @@ library
     , network
   default-language: Haskell2010
 
-test-suite wait-on-port-test
+test-suite unit-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
