@@ -14,7 +14,7 @@ import qualified Control.Exception as E
 -- Simple Api
 -------------------------------------------------------------------------------
 
--- | 'wait' will retry to connect to the given host and port repeated every
+-- | 'wait' will attempt to connect to the given host and port repeated every
 -- 10 milliseconds until it is successful. It will throw an 'IOError' if the
 -- host cannot be resolved.
 --
