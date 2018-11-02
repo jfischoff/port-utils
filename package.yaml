@@ -1,6 +1,6 @@
 name:                port-utils
 version:             0.1.0.0
-github: jfischoff/port-utilities
+github: jfischoff/port-utils
 license:             BSD3
 author:              "Jonathan Fischoff"
 maintainer:          "jonathangfischoff@gmail.com"
@@ -11,13 +11,12 @@ extra-source-files:
 - ChangeLog.md
 
 synopsis: Utilities for creating and waiting on ports
-description:
-  Utilities for creating and waiting on ports.
-  .
-  @openFreePort@ will create a socket bound to a random free port will @warp@'s @openFreePort@
-  .
-  @wait@ will attempt to connect to given host and port until successful.
-  .
+description: Utilities for creating and waiting on ports.
+ .
+ @openFreePort@ will create a socket bound to a random port like @warp@'s @openFreePort@
+ .
+ @wait@ will attempt to connect to given host and port repeatedly until successful.
+ .
 
 default-extensions:
 - ScopedTypeVariables

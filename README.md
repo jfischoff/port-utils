@@ -1,4 +1,4 @@
-# port-utilities
+# port-utils
 
 ## openFreePort
 

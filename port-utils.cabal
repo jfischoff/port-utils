@@ -2,19 +2,19 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1ad31dac471f46cb9662477c2482898df6c968ddb94a409cfd8cdd7ec870c4a1
+-- hash: a4b977c55cfc771734a4d088a9f2375366c5b9270ccf62d29d7fdf59e5eb3161
 
 name:           port-utils
 version:        0.1.0.0
 synopsis:       Utilities for creating and waiting on ports
 description:    Utilities for creating and waiting on ports.
-.
-@openFreePort@ will create a socket bound to a random free port will @warp@'s @openFreePort@
-.
-@wait@ will attempt to connect to given host and port until successful.
-.
-homepage:       https://github.com/jfischoff/port-utilities#readme
-bug-reports:    https://github.com/jfischoff/port-utilities/issues
+ .
+ @openFreePort@ will create a socket bound to a random port (like @warp@'s @openFreePort@)
+ .
+ @wait@ will attempt to connect to given host and port repeatedly until successful.
+ .
+homepage:       https://github.com/jfischoff/port-utils#readme
+bug-reports:    https://github.com/jfischoff/port-utils/issues
 author:         Jonathan Fischoff
 maintainer:     jonathangfischoff@gmail.com
 copyright:      2018 Jonathan Fischoff
@@ -28,7 +28,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/jfischoff/port-utilities
+  location: https://github.com/jfischoff/port-utils
 
 library
   exposed-modules:
