@@ -14,6 +14,7 @@ description: A single function library which attempts to connect a port over and
 
 dependencies:
 - base >= 4.7 && < 5
+- network
 
 library:
   source-dirs: src
