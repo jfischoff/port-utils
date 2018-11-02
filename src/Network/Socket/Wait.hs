@@ -42,15 +42,17 @@ wait = waitWith mempty defaultDelay
 openFreePort :: IO (Int, N.Socket)
 openFreePort =
   E.bracketOnError (N.socket N.AF_INET N.Stream N.defaultProtocol) N.close
-    $ \sock -> N.getSocketName sock >>= \case
-      N.SockAddrInet port _ -> pure (fromIntegral port, sock)
-      addr -> E.throwIO
-        $ Error.mkIOError Error.userErrorType
-          (  "openFreePort was unable to create socket with a SockAddrInet. "
-          <> "Got " <> show addr
-          )
-          Nothing
-          Nothing
+    $ \sock -> do
+      N.bind sock $ N.SockAddrInet 0 $ N.tupleToHostAddress (127,0,0,1)
+      N.getSocketName sock >>= \case
+        N.SockAddrInet port _ -> pure (fromIntegral port, sock)
+        addr -> E.throwIO
+          $ Error.mkIOError Error.userErrorType
+            (  "openFreePort was unable to create socket with a SockAddrInet. "
+            <> "Got " <> show addr
+            )
+            Nothing
+            Nothing
 
 -------------------------------------------------------------------------------
 -- Advanced Api
