@@ -5,11 +5,11 @@
 -- hash: 1d9819c36e0182c73f52e502f0bdd4d406aa01dd948ec440d6852ba1e7bd482b
 
 name:           port-utils
-version:        0.1.0.3
+version:        0.1.0.4
 synopsis:       Utilities for creating and waiting on ports
 description:    Utilities for creating and waiting on ports.
  .
- @openFreePort@ will create a socket bound to a random port (like @warp@'s @openFreePort @).
+ @openFreePort@ will create a socket bound to a random port (like @warp@'s @openFreePort@).
  .
  @wait@ will attempt to connect to given host and port repeatedly until successful.
  .
