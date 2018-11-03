@@ -2,9 +2,9 @@
 
 ## openFreePort
 
-This is another version of `warp`'s `openFreePort` function. Nice if you don't already depend on `warp`.
+This is another version of `warp`'s `openFreePort` function. This function has fewer dependencies than the `warp` version.
 
-`openFreePort` returns a socket on random port and the port it has been bound to.
+`openFreePort` returns a socket on a random port and the port it has been bound to.
 
 ```haskell
 openFreePort :: IO (Int, Socket)
@@ -12,7 +12,7 @@ openFreePort :: IO (Int, Socket)
 
 ## wait
 
-`wait` will attempt to connect to a host and port until successful. Between each unsuccessful attempt it sleeps for 10 ms
+`wait` will attempt to connect to a host and port until it is successful. Between each unsuccessful attempt, it sleeps for 10 ms.
 
 Here is an example of the primary function:
 
@@ -32,4 +32,4 @@ In bash one could write:
 while ! nc -z localhost 7000 ; do sleep 0.01 ; done
 ```
 
-The above was copied from this stackoverflow answer https://stackoverflow.com/a/50008755
+The bash script above was copied from this stackoverflow answer https://stackoverflow.com/a/50008755

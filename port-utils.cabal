@@ -6,12 +6,12 @@
 
 name:           port-utils
 version:        0.1.0.2
-synopsis:       Utilities for creating and waiting on ports
-description:    Utilities for creating and waiting on ports.
+synopsis:       These are utilities for creating and waiting on ports.
+description:    These are utilities for creating and waiting on ports.
   .
   @openFreePort@ will create a socket bound to a random port (like @warp@'s @openFreePort@).
   .
-  @wait@ will attempt to connect to given host and port repeatedly until successful.
+  @wait@ will attempt to connect to a given host and port repeatedly until successful.
   .
 homepage:       https://github.com/jfischoff/port-utils#readme
 bug-reports:    https://github.com/jfischoff/port-utils/issues
