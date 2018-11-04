@@ -28,6 +28,20 @@ throwTimeout delay msg action = T.timeout delay action >>= \case
 
 spec :: H.Spec
 spec = do
+  H.describe "wait" $ H.before F.openFreePort $ H.after (N.close . snd) $ do
+    H.it "does not connect if port is unavailable" $ \(port, sock) -> do
+      N.close sock
+
+      T.timeout 100000 (W.wait "127.0.0.1" port) >>= \case
+        Nothing -> pure ()
+        Just () -> fail "wait returned! I should have blocked forever!"
+    H.it "does connect if port is available" $ \(port, sock) -> do
+      N.listen sock 128
+
+      T.timeout 100000 (W.wait "127.0.0.1" port) >>= \case
+        Nothing -> fail "wait timed out attempting to connect! I should have returned immediantly!"
+        Just () -> pure ()
+
   H.describe "connectAction" $ H.before F.openFreePort $ H.after (N.close . snd) $ do
     H.it "returns False if it fails to connect" $ \(port, sock) -> do
       N.close sock
