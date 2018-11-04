@@ -1,30 +1,39 @@
 # The Event Handler Pattern
 
-The `EventHandlers` pattern is a way to write libraries that allow clients to instrument the library code.
+The `EventHandlers` pattern is a way to write libraries clients can instrument.
 
-The idea is one exposes a simple interface like:
-
-```haskell
-foo :: IO ()
-```
-
-with an advanced interface
+If you have a simple interface like
 
 ```haskell
-fooWith :: EventHandlers -> IO ()
+foo :: Context ()
 ```
 
-that takes in a record of `IO` actions that are called during when important events occur during the execution of `foo`.
+You can also expose an advanced interface
 
-It is pretty simple idea but surprisingly useful. I'll walk though the idea in depth by looking a small library I just made called `port-utils`.
+```haskell
+fooWith :: EventHandlers -> Context ()
+```
+
+where `EventHandlers` is a record of `Context` actions that are called at key moments inside `fooWith`.
+
+```haskell
+data EventHandlers = EventHandlers
+  { beforeMissleLaunch :: Context ()
+  , fundingSecured     :: Int -> Context ()
+  }
+```
+
+There is not much to the idea but I think it is useful.
+
+I'll walk though the idea in depth by looking a small library I just made called `port-utils`.
 
 ## The Design of `port-utils`
 
 `port-utils` is a very simple library. It has one non-trivial function called `wait`. `wait` will attempt to connect to host and port over and over until successful.
 
-Waiting until a server is ready by attempting to connect to it is a useful way to ensure api tests don't fail interminently. The library started as a function I would copy from project to project and eventually bit the bullet and put it up on hackage.
+Waiting until a server is ready by attempting to connect to it is a useful way to ensure API tests don't fail interminently if they happen to try to connect to the server before it is accepting requests. The library started as a function I would copy from project to project and eventually bit the bullet and put it up on hackage.
 
-The type signature is:
+The type signature of `wait` is:
 
 ```haskell
 wait :: String -> Int -> IO ()
@@ -34,7 +43,7 @@ wait :: String -> Int -> IO ()
 
 If a client library uses `wait` in production code it is possible they would like to know what is happening inside the loop of `wait`.
 
-Imagine a user knows that their program is stuck in the `wait` function in production but they are not sure why. Ideally `wait` should provide some way to gain insight into why it is blocked. This where the Event Handler pattern comes in.
+Imagine a user knows that their program is stuck in the `wait` function but they are not sure why. Ideally `wait` should provide some way to gain insight into why it is blocked. This where the `EventHandler` pattern comes in.
 
 We offer an advanced API that with the following signature:
 
@@ -46,12 +55,12 @@ The `EventHandlers` is defined as:
 
 ```haskell
 data EventHandlers = EventHandlers
-  { createdSocket :: IO ()
-  -- ^ Called after the socket is created
-  , delaying      :: IO ()
+  { connection :: IO ()
+  -- ^ Called before the socket is created
+  , delaying :: IO ()
   -- ^ Called after a failed attempt to connect before the thread
   -- is put to sleep.
-  , restarting    :: IO ()
+  , restarting :: IO ()
   -- ^ Called before a recursive call to restart the connection attempt
   }
 ```
@@ -109,9 +118,3 @@ What ever effects occur in the event handlers should be "beign". They should not
 On the other hand whatever one does in the handlers will be no worse than making the same call inline.
 
 The primary value for the Event Handler pattern is to provide operational insight without making an arbitrary choice on how to log the events.
-
-It tends to be that once the `EventHandlers` have been setup one can use the record to faciliate testing.
-
-## Conclusion
-
-The `EventHandlers` pattern is simple way to provide client code to gain operational insight into a process without committing to a particular method to ingest the data.
