@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2ea8957bf999f09f8b9952b39bcb26e3a1b41fa92530e4ae4078cb514fd9984f
+-- hash: 86eb2c8b9fe7b1d2f8dcce2f6eae318261062f193924cf7fe0119f3191c4088b
 
 name:           port-utils
 version:        0.2.0.0
@@ -34,11 +34,12 @@ library
   exposed-modules:
       Network.Socket.Free
       Network.Socket.Wait
+      Network.Socket.Wait.Internal
   other-modules:
       Paths_port_utils
   hs-source-dirs:
       src
-  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase UndecidableInstances
+  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase UndecidableInstances TypeSynonymInstances FlexibleInstances
   build-depends:
       base >=4.7 && <5
     , network
@@ -52,7 +53,7 @@ test-suite unit-test
       Paths_port_utils
   hs-source-dirs:
       test
-  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase UndecidableInstances
+  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase UndecidableInstances TypeSynonymInstances FlexibleInstances
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       async
@@ -61,4 +62,5 @@ test-suite unit-test
     , network
     , port-utils
     , stm
+    , transformers
   default-language: Haskell2010

@@ -23,6 +23,8 @@ default-extensions:
 - RecordWildCards
 - LambdaCase
 - UndecidableInstances
+- TypeSynonymInstances
+- FlexibleInstances
 
 dependencies:
 - base >= 4.7 && < 5
@@ -44,3 +46,4 @@ tests:
     - hspec
     - stm
     - port-utils
+    - transformers

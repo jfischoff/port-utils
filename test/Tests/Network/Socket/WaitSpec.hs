@@ -1,5 +1,6 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Tests.Network.Socket.WaitSpec where
-import qualified Network.Socket.Wait as W
+import qualified Network.Socket.Wait.Internal as W
 import qualified Network.Socket.Free as F
 import qualified Network.Socket as N
 import qualified Control.Concurrent as C
@@ -8,15 +9,17 @@ import qualified Control.Exception as E
 import qualified Test.Hspec as H
 import qualified System.Timeout as T
 import qualified Control.Concurrent.Async as A
+import qualified Control.Monad.Trans.State as St
+
+instance Monad m => Semigroup (St.StateT s m ()) where
+  (<>) = (>>)
+
+instance Monad m => Monoid (St.StateT s m ()) where
+  mempty = pure ()
+  mappend = (<>)
 
 main :: IO ()
 main = H.hspec spec
-
-data WaitState
-  = Start
-  | Retried
-  | Open
-  deriving (Show, Eq)
 
 throwTimeout :: Int -> String -> IO a -> IO a
 throwTimeout delay msg action = T.timeout delay action >>= \case
@@ -24,64 +27,40 @@ throwTimeout delay msg action = T.timeout delay action >>= \case
   Just x -> pure x
 
 spec :: H.Spec
-spec = H.before F.openFreePort $ H.after (N.close . snd) $ H.describe "wait" $ do
-  H.it "retries if a socket is not ready" $ \(port, sock) -> do
-    -- There is a small race some what might connect to this
-    N.close sock
+spec = do
+  H.describe "connectAction" $ H.before F.openFreePort $ H.after (N.close . snd) $ do
+    H.it "returns False if it fails to connect" $ \(port, sock) -> do
+      N.close sock
+      -- There is a small race that another process might bind to this port
+      W.connectAction "127.0.0.1" port `H.shouldReturn` False
 
-    retryRef <- S.newTVarIO 0
+    H.it "returns True if it connects" $ \(port, sock) -> do
+      N.listen sock 128
 
-    let retryCount = 2
+      W.connectAction "127.0.0.1" port `H.shouldReturn` True
 
-        handlers = mempty { W.restarting = S.atomically $ S.modifyTVar' retryRef (+1) }
+    H.it "returns True if connects after failing" $ \(port, sock) -> do
+      N.close sock
 
-    let start = W.waitWith handlers W.defaultDelay "127.0.0.1" port
-    E.bracket (C.forkIO start) C.killThread $ \_ ->
-      T.timeout
-        (retryCount * W.defaultDelay * 10) -- wait more than long enough
-        (S.atomically $ S.check . (==2) =<< S.readTVar retryRef) >>= \case
-          Nothing
-            -> fail
-            $ "timed out waiting for the wait to retry "
-            ++ show retryCount
-            ++ " times"
-          Just _  -> pure ()
+      W.connectAction "127.0.0.1" port `H.shouldReturn` False
 
-  H.it "connects immediantly to socket when it is ready" $ \(port, sock) -> do
-    N.listen sock 128
+      E.bracket (N.socket N.AF_INET N.Stream N.defaultProtocol) N.close $ \sock' -> do
+         N.bind sock' $ N.SockAddrInet (fromIntegral port) $ N.tupleToHostAddress (127,0,0,1)
+         N.listen sock' 128
 
-    retryRef <- S.newTVarIO 0
+         W.connectAction "127.0.0.1" port `H.shouldReturn` True
 
-    let handlers = mempty { W.restarting = S.atomically $ S.modifyTVar' retryRef (+1) }
+    H.it "throws if the host does not exist" $ \(_, _) -> do
+      W.connectAction "invalid." 3000 `H.shouldThrow` (\(_ :: IOError) -> True)
 
-    T.timeout
-      (W.defaultDelay * 10) -- wait more than long enough
-      (W.waitWith handlers W.defaultDelay "127.0.0.1" port) >>= \case
-        Nothing -> fail "timed out waiting to connect"
-        Just _  -> S.atomically (S.readTVar retryRef) `H.shouldReturn` 0
+  H.describe "waitM" $ do
+    H.it "returns immediantly if the action returns True" $
+      flip St.execState False (W.waitM mempty (St.put True) (pure True)) `H.shouldBe` False
 
-  H.it "connects even if the socket is not open at first" $ \(port, sock) -> do
-    N.close sock
-    retryRef <- S.newTVarIO Start
+    H.it "loops until the action returns True" $ do
+      let theAction = do
+            St.get >>= \case
+              0 -> St.put 1 >> pure False
+              _ -> St.put 2 >> pure True
 
-    let handlers = mempty
-          { W.restarting    = S.atomically $ S.writeTVar retryRef Retried
-          , W.acting = S.atomically $ S.readTVar retryRef >>= \case
-              -- Pass through and first and fail
-              Start   -> pure ()
-              -- Block until listening
-              Retried -> S.retry
-              -- Pass through
-              Open    -> pure ()
-          }
-
-    let start = W.waitWith handlers W.defaultDelay "127.0.0.1" port
-    throwTimeout 100000 "waiting for wait to return"
-      $ E.bracket (A.async start) A.wait $ \_ -> do
-        S.atomically $ S.check . (==Retried) =<< S.readTVar retryRef
-
-        E.bracketOnError (N.socket N.AF_INET N.Stream N.defaultProtocol) N.close
-          $ \sock' -> do
-            S.atomically $ S.writeTVar retryRef Open
-            N.bind sock' $ N.SockAddrInet (fromIntegral port) $ N.tupleToHostAddress (127,0,0,1)
-            N.listen sock' 128
+      flip St.execState 0 (W.waitM mempty (pure ()) theAction) `H.shouldBe` 2
