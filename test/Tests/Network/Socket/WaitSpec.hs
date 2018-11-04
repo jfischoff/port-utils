@@ -21,11 +21,6 @@ instance Monad m => Monoid (St.StateT s m ()) where
 main :: IO ()
 main = H.hspec spec
 
-throwTimeout :: Int -> String -> IO a -> IO a
-throwTimeout delay msg action = T.timeout delay action >>= \case
-  Nothing -> fail $ "timed out " ++ msg
-  Just x -> pure x
-
 spec :: H.Spec
 spec = do
   H.describe "wait" $ H.before F.openFreePort $ H.after (N.close . snd) $ do
