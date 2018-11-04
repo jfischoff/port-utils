@@ -37,17 +37,16 @@ spec = do
         Just () -> pure ()
 
   H.describe "connectAction" $ H.before F.openFreePort $ H.after (N.close . snd) $ do
-    H.it "returns False if it fails to connect" $ \_ -> do
-
+    H.it "returns False if it fails to connect" $ \_ ->
       W.connectAction "127.0.0.1" 0 `H.shouldReturn` False
 
     H.it "returns True if it connects" $ \(port, sock) -> do
       N.listen sock 128
-
       W.connectAction "127.0.0.1" port `H.shouldReturn` True
 
     H.it "returns True if connects after failing" $ \(port, sock) -> do
       N.close sock
+      -- small race here if another process opens on this port
 
       W.connectAction "127.0.0.1" port `H.shouldReturn` False
 
