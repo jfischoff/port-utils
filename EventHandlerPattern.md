@@ -23,9 +23,7 @@ data EventHandlers = EventHandlers
   }
 ```
 
-There is not much to the idea but I think it is useful.
-
-I'll walk though the idea in depth by looking a small library I just made called `port-utils`.
+A simple library I made called `port-utils` highlights this pattern.
 
 ## The Design of `port-utils`
 
