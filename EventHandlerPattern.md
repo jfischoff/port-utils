@@ -51,7 +51,7 @@ The `EventHandlers` is defined as:
 
 ```haskell
 data EventHandlers = EventHandlers
-  { connection :: IO ()
+  { connecting :: IO ()
   -- ^ Called before the socket is created
   , delaying :: IO ()
   -- ^ Called after a failed attempt to connect before the thread
@@ -66,12 +66,12 @@ The `EventHandlers` let us pass in `IO` actions which are triggered during key m
 ```haskell
 createEkgMetrics :: Store -> IO EventHandlers
 createEkgMetrics store = do
-    createdSocketCounter <- createCounter store "created-socket"
-    delayingCounter      <- createCounter store "delaying"
-    restartingCounter    <- createCounter store "restarting"
+    connectingCounter <- createCounter store "connecting"
+    delayingCounter   <- createCounter store "delaying"
+    restartingCounter <- createCounter store "restarting"
 
     pure EventHandlers
-      { createdSocket = inc createdSocketCounter
+      { createdSocket = inc connectingCounter
       , delaying      = inc delaying
       , restarting    = inc restartingCounter
       }
@@ -84,9 +84,9 @@ We could also use the Event Handlers for logging by creating a record like:
 ```haskell
 printEventHandlers :: EventHandlers
 printEventHandlers = EventHandlers
-  { createdSocket = putStrLn "createdSocket"
-  , delaying      = putStrLn "delaying"
-  , restarting    = putStrLn "restarting"
+  { connecting = putStrLn "connecting"
+  , delaying   = putStrLn "delaying"
+  , restarting = putStrLn "restarting"
   }
 ```
 
