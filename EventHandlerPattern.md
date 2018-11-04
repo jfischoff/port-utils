@@ -29,8 +29,6 @@ A simple library I made called `port-utils` highlights this pattern.
 
 `port-utils` is a very simple library. It has one non-trivial function called `wait`. `wait` will attempt to connect to host and port over and over until successful.
 
-Waiting until a server is ready by attempting to connect to it is a useful way to ensure API tests don't fail interminently if they happen to try to connect to the server before it is accepting requests. The library started as a function I would copy from project to project and eventually bit the bullet and put it up on hackage.
-
 The type signature of `wait` is:
 
 ```haskell
@@ -101,9 +99,9 @@ wait = waitWith mempty
 
 ## Operational Insight Matters
 
-I think operational insight is often more important than establishing correctness. Even if your code is perfect it will still depend on host of other systems that can go wrong. Having the ability to monitor and debug a production system is crucially important regardless of the quality of your code.
+I think there is view that operational insight is not necessary if your code is correct. Even if you code is correct your applications can feel because dependencies outside your control. Operational insight is necessary.
 
-The Event Handler pattern allows one to provide the option for operational insight without being directly tied of a logging or metrics library.
+The `EventHandlers` pattern allows one to provide the option for operational insight without being directly tied of a logging or metrics library.
 
 The pattern has a few downsides.
 
