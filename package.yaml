@@ -1,5 +1,5 @@
 name:                port-utils
-version:             0.1.0.4
+version:             0.2.0.0
 github: jfischoff/port-utils
 license:             BSD3
 author:              "Jonathan Fischoff"
@@ -22,6 +22,7 @@ default-extensions:
 - ScopedTypeVariables
 - RecordWildCards
 - LambdaCase
+- UndecidableInstances
 
 dependencies:
 - base >= 4.7 && < 5

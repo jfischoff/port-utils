@@ -66,7 +66,7 @@ spec = H.before F.openFreePort $ H.after (N.close . snd) $ H.describe "wait" $ d
 
     let handlers = mempty
           { W.restarting    = S.atomically $ S.writeTVar retryRef Retried
-          , W.createdSocket = S.atomically $ S.readTVar retryRef >>= \case
+          , W.acting = S.atomically $ S.readTVar retryRef >>= \case
               -- Pass through and first and fail
               Start   -> pure ()
               -- Block until listening

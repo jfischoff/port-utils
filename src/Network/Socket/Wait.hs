@@ -55,30 +55,30 @@ defaultDelay = 10000
 --
 -- @
 --    printHandlers = EventHandlers
---      { createdSocket = putStrLn "createdSocket"
---      , delaying      = putStrLn "delaying"
---      , restarting    = putStrLn "restarting"
+--      { acting     = putStrLn "acting"
+--      , delaying   = putStrLn "delaying"
+--      , restarting = putStrLn "restarting"
 --      }
 -- @
 --
-data EventHandlers = EventHandlers
-  { createdSocket :: IO ()
+data EventHandlers m = EventHandlers
+  { acting :: m ()
   -- ^ Called after the socket is created
-  , delaying      :: IO ()
+  , delaying :: m ()
   -- ^ Called after a failed attempt to connect before the thread
   -- is put to sleep.
-  , restarting    :: IO ()
+  , restarting :: m ()
   -- ^ Called before a recursive call to restart the connection attempt
   }
 
-instance Semigroup EventHandlers where
+instance Semigroup (m ()) => Semigroup (EventHandlers m) where
   x <> y = EventHandlers
-    { createdSocket = createdSocket x <> createdSocket y
-    , delaying      = delaying      x <> delaying      y
-    , restarting    = restarting    x <> restarting    y
+    { acting        = acting      x <> acting     y
+    , delaying      = delaying    x <> delaying   y
+    , restarting    = restarting  x <> restarting y
     }
 
-instance Monoid EventHandlers where
+instance Monoid (m ()) => Monoid (EventHandlers m) where
   mempty  = EventHandlers mempty mempty mempty
   mappend = (<>)
 
@@ -91,7 +91,7 @@ instance Monoid EventHandlers where
 -- @
 --
 -- Since 0.0.0.1
-waitWith :: EventHandlers
+waitWith :: EventHandlers IO
          -- ^ A record of IO actions that are called during sp
          -> Int
          -- ^ Microseconds to delay
@@ -100,23 +100,31 @@ waitWith :: EventHandlers
          -> Int
          -- ^ Port
          -> IO ()
-waitWith eh@EventHandlers {..} delay host port = do
-  res <- E.try $ do
-    let hints = N.defaultHints { N.addrSocketType = N.Stream }
-    -- getAddrInfo returns a non-empty array or throws per the doc
-    addr:_ <- N.getAddrInfo (Just hints) (Just host) (Just $ show port)
-    E.bracket
-      (N.socket (N.addrFamily addr) (N.addrSocketType addr) (N.addrProtocol addr))
-      N.close
-      $ \sock -> do
-        createdSocket
-        N.connect sock $ N.addrAddress addr
+waitWith eh delay host port
+  = waitM eh (C.threadDelay delay) (connectAction host port)
 
-  case res of
-    Left (_ :: E.IOException) -> do
+waitM :: Monad m => EventHandlers m -> m () -> m Bool -> m ()
+waitM eh@EventHandlers {..} delayer action = do
+  acting
+  action >>= \case
+    True -> pure ()
+    False -> do
       delaying
-      C.threadDelay delay
+      delayer
 
       restarting
-      waitWith eh delay host port
-    Right _ -> pure ()
+      waitM eh delayer action
+
+connectAction :: String -> Int -> IO Bool
+connectAction host port = do
+  let hints = N.defaultHints { N.addrSocketType = N.Stream }
+  -- getAddrInfo returns a non-empty array or throws per the doc
+  addr:_ <- N.getAddrInfo (Just hints) (Just host) (Just $ show port)
+  e <- E.try $ E.bracket
+        (N.socket (N.addrFamily addr) (N.addrSocketType addr) (N.addrProtocol addr))
+        N.close
+        $ \sock -> N.connect sock $ N.addrAddress addr
+
+  pure $ case e of
+    Left (_ :: IOError) -> False
+    Right _ -> True

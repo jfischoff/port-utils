@@ -2,10 +2,10 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1d9819c36e0182c73f52e502f0bdd4d406aa01dd948ec440d6852ba1e7bd482b
+-- hash: 2ea8957bf999f09f8b9952b39bcb26e3a1b41fa92530e4ae4078cb514fd9984f
 
 name:           port-utils
-version:        0.1.0.4
+version:        0.2.0.0
 synopsis:       Utilities for creating and waiting on ports
 description:    Utilities for creating and waiting on ports.
  .
@@ -13,7 +13,6 @@ description:    Utilities for creating and waiting on ports.
  .
  @wait@ will attempt to connect to given host and port repeatedly until successful.
  .
-
 homepage:       https://github.com/jfischoff/port-utils#readme
 bug-reports:    https://github.com/jfischoff/port-utils/issues
 author:         Jonathan Fischoff
@@ -39,7 +38,7 @@ library
       Paths_port_utils
   hs-source-dirs:
       src
-  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase
+  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase UndecidableInstances
   build-depends:
       base >=4.7 && <5
     , network
@@ -53,7 +52,7 @@ test-suite unit-test
       Paths_port_utils
   hs-source-dirs:
       test
-  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase
+  default-extensions: ScopedTypeVariables RecordWildCards LambdaCase UndecidableInstances
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       async
