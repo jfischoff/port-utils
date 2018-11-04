@@ -96,7 +96,7 @@ instance Monoid (m ()) => Monoid (EventHandlers m) where
 --    wait = waitWith mempty defaultDelay
 -- @
 --
--- Since 0.0.0.1
+-- Since 0.2.0.0
 waitWith :: EventHandlers IO
          -- ^ A record of IO actions that are called during sp
          -> Int
