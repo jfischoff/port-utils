@@ -99,7 +99,7 @@ wait = waitWith mempty
 
 ## Operational Insight Matters
 
-I think there is view that operational insight is not necessary if your code is correct. Even if you code is correct your applications can feel because dependencies outside your control. Operational insight is necessary.
+I think there is view that operational insight is not necessary if your code is correct. Even if you code is correct your applications can fail because dependencies outside your control. Operational insight is necessary.
 
 The `EventHandlers` pattern allows one to provide the option for operational insight without being directly tied of a logging or metrics library.
 
