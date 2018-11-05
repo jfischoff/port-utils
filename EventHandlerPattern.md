@@ -39,7 +39,7 @@ wait :: String -> Int -> IO ()
 
 When a user calls `wait` it is possible they would like to know what is happening internally.
 
-Ideally `wait` should provide some way to explain what it is doing. This where the `EventHandler` pattern comes in.
+Ideally `wait` would provide some way to explain what it is doing. This is where the `EventHandler` pattern comes in.
 
 We offer an advanced API that with the following signature:
 
@@ -61,7 +61,7 @@ data EventHandlers = EventHandlers
   }
 ```
 
-The `EventHandlers` let us pass in `IO` actions which are triggered during key moments allowing us to track the progress of `waitWith`. If we passed in `ekg` metrics:
+The `IO` actions are triggered during key moments allowing one to track the progress of `waitWith`. If we passed in `ekg` metrics:
 
 ```haskell
 createEkgMetrics :: Store -> IO EventHandlers
@@ -77,9 +77,9 @@ createEkgMetrics store = do
       }
 ```
 
-By observing the rate of the metrics we would be able to conclude if `wait` was stuck in the `connect` call or if it was failing to connect over and over again.
+we could observe the rate of the counter and conclude if `wait` was stuck in the `connect` call or if it was failing to connect over and over again.
 
-We could also use the Event Handlers for logging by creating a record like:
+We could also use the `EventHandlers` for logging by creating a record like:
 
 ```haskell
 printEventHandlers :: EventHandlers
@@ -114,17 +114,18 @@ wait = waitWith mempty
 
 ## Operational Insight Matters
 
-Even if you code is correct your applications can fail because of dependencies outside your control. Operational observability is necessary even if your code is correct.
+Even if you code is correct your applications can fail because of dependencies outside your control.
 
 The `EventHandlers` pattern allows one to provide the option for operational observability without being directly tied to a logging or metrics library.
 
 The pattern has a few downsides.
 
-It is more complicated than doing nothing.
+1. It is more complicated than doing nothing.
+1. Not practical for tight loops.
+1. It's a footgun. A user can do evil things and break library invariants.
+1. It too simple for instrumentation that requires a call graph of the events.
 
-Also, if one tries do something complex in the event handler methods you could accidently break an library invariant or just create a very difficult to follow program.
-
-Another disadvantage is it too simple for instrumentation that requires a call graph of the events.
+That said, I find the power to weight ratio to be high.
 
 ## Conclusion
 
