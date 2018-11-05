@@ -23,11 +23,11 @@ data EventHandlers = EventHandlers
   }
 ```
 
-A simple library I made called `port-utils` highlights this pattern.
+A simple library I made called [`port-utils`](http://hackage.haskell.org/package/port-utils) highlights this pattern.
 
 ## The Design of `port-utils`
 
-`port-utils` is a very simple library. It has one non-trivial function called `wait`. `wait` will attempt to connect to host and port over and over until successful.
+[`port-utils`](http://hackage.haskell.org/package/port-utils) is a very simple library. It has one non-trivial function called `wait`. `wait` will attempt to connect to host and port over and over until successful.
 
 The type signature of `wait` is:
 
@@ -99,18 +99,18 @@ wait = waitWith mempty
 
 ## Operational Insight Matters
 
-I think there is view that operational insight is not necessary if your code is correct. Even if you code is correct your applications can fail because dependencies outside your control. Operational insight is necessary.
+Even if you code is correct your applications can fail because of dependencies outside your control. Operational observability is necessary.
 
-The `EventHandlers` pattern allows one to provide the option for operational insight without being directly tied of a logging or metrics library.
+The `EventHandlers` pattern allows one to provide the option for operational observability without being directly tied of a logging or metrics library.
 
 The pattern has a few downsides.
 
-If no client library ever uses a non-trivial `EventHandlers` record than you have a provided a feature that complicates the design but buys nothing.
+It is more complicated than doing nothing.
 
-Another downside with the pattern is you are giving your users a footgun they can abuse. If one tries do something complex in the event handler methods you could accidently break an library invariant or just create a very difficult to follow program.
+Also, if one tries do something complex in the event handler methods you could accidently break an library invariant or just create a very difficult to follow program.
 
-What ever effects occur in the event handlers should be "beign". They should not cause the behavior of the program to change. Various forms of logging should in general work with definition but unconditionally.
+What ever effects occur in the event handlers should be "benign". They should not cause the behavior of the program to change.
 
-On the other hand whatever one does in the handlers will be no worse than making the same call inline.
+## Conclusion
 
-The primary value for the Event Handler pattern is to provide operational insight without making an arbitrary choice on how to log the events.
+The `EventHandlers` pattern is a simple way for users of your library to gain operational insight without making an arbitrary choice on how to log the events.
