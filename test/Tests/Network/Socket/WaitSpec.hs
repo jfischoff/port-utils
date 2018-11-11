@@ -25,10 +25,10 @@ spec :: H.Spec
 spec = do
   H.describe "wait" $ H.before F.openFreePort $ H.after (N.close . snd) $ do
     H.it "does not connect if port is unavailable" $ \_ -> do
-
       T.timeout 100000 (W.wait "127.0.0.1" 0) >>= \case
         Nothing -> pure ()
         Just () -> fail "wait returned! I should have blocked forever!"
+
     H.it "does connect if port is available" $ \(port, sock) -> do
       N.listen sock 128
 

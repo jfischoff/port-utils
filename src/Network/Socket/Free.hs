@@ -1,6 +1,5 @@
 module Network.Socket.Free (openFreePort) where
 import qualified Network.Socket as N
-import qualified Control.Concurrent as C
 import qualified Control.Exception as E
 import qualified System.IO.Error as Error
 
