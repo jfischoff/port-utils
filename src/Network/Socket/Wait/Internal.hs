@@ -15,6 +15,7 @@ module Network.Socket.Wait.Internal
 import qualified Network.Socket as N
 import qualified Control.Concurrent as C
 import qualified Control.Exception as E
+import qualified System.IO.Error as IOE
 
 -------------------------------------------------------------------------------
 -- Simple Api
@@ -107,7 +108,13 @@ waitWith :: EventHandlers IO
          -- ^ Port
          -> IO ()
 waitWith eh delay host port
-  = waitM eh (C.threadDelay delay) (connectAction host port)
+  = if port < 1
+      then E.throwIO $ IOE.mkIOError
+            IOE.illegalOperationErrorType
+            ("Invalid port! " <> show port <> " is less than 1")
+            Nothing
+            Nothing
+      else waitM eh (C.threadDelay delay) (connectAction host port)
 
 -- | This function loops if the second argument returns 'False'. Between the
 --   recursive calls it will call it's first argument.
