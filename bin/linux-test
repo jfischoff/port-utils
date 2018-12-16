@@ -1,0 +1,4 @@
+#! /usr/bin/env bash
+set -eu
+vagrant up
+vagrant ssh --command "cd /vagrant_data && stack test"

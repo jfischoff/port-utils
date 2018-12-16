@@ -1,18 +1,15 @@
--- This file has been generated from package.yaml by hpack version 0.28.2.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 86eb2c8b9fe7b1d2f8dcce2f6eae318261062f193924cf7fe0119f3191c4088b
+-- hash: 5f881948035b26d5de5a9e7329160404eb5eae54ace0a3b7726b133907d0ba35
 
 name:           port-utils
 version:        0.2.0.0
 synopsis:       Utilities for creating and waiting on ports
-description:    Utilities for creating and waiting on ports.
- .
- @openFreePort@ will create a socket bound to a random port (like @warp@'s @openFreePort@).
- .
- @wait@ will attempt to connect to given host and port repeatedly until successful.
- .
+description:    Utilities for creating and waiting on ports. . @openFreePort@ will create a socket bound to a random port (like @warp@'s @openFreePort@). . @wait@ will attempt to connect to given host and port repeatedly until successful. .
 homepage:       https://github.com/jfischoff/port-utils#readme
 bug-reports:    https://github.com/jfischoff/port-utils/issues
 author:         Jonathan Fischoff
@@ -21,10 +18,9 @@ copyright:      2018 Jonathan Fischoff
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
-cabal-version:  >= 1.10
 extra-source-files:
-    ChangeLog.md
     README.md
+    ChangeLog.md
 
 source-repository head
   type: git
@@ -40,6 +36,7 @@ library
   hs-source-dirs:
       src
   default-extensions: ScopedTypeVariables RecordWildCards LambdaCase UndecidableInstances TypeSynonymInstances FlexibleInstances
+  ghc-options: -Wall
   build-depends:
       base >=4.7 && <5
     , network

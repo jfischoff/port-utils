@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE CPP #-}
 module Tests.Network.Socket.WaitSpec where
 import qualified Network.Socket.Wait.Internal as W
 import qualified Network.Socket.Free as F
@@ -24,18 +25,15 @@ blockPort sock = E.bracket F.openFreePort (N.close . snd) $ \(port1, sock1) -> d
   N.connect sock $ N.SockAddrInet (fromIntegral port1) $ N.tupleToHostAddress (127,0,0,1)
   M.forever $ C.threadDelay 100000000
 
-testUnavailableSetup :: String -> (IO () -> Int -> IO ()) -> H.SpecWith (Int, N.Socket)
-testUnavailableSetup message test = H.describe (message ++ " when the port is") $ do
+testAtFirstUnavailable :: String -> (IO () -> Int -> IO ()) -> H.SpecWith (Int, N.Socket)
+testAtFirstUnavailable message test = H.describe (message ++ " when the port is") $ do
    H.it "free" $ \(port, sock) -> N.close sock >> test (pure ()) port
    H.it "bound but not in a TCP state" $ \(port, sock) -> test (N.close sock) port
    H.it "in a state other than listening" $ \(port, sock) ->
      A.withAsync (blockPort sock) $ \thread -> test (A.cancel thread >> N.close sock) port
 
 testUnavailable :: String -> (Int -> IO ()) -> H.SpecWith (Int, N.Socket)
-testUnavailable message = testUnavailableSetup message . const
-
-testAtFirstUnavailable :: String -> (IO () -> Int -> IO ()) -> H.SpecWith (Int, N.Socket)
-testAtFirstUnavailable message = testUnavailableSetup message
+testUnavailable message = testAtFirstUnavailable message . const
 
 withListeningSocket :: Int -> IO () -> IO ()
 withListeningSocket port action = E.bracket (N.socket N.AF_INET N.Stream N.defaultProtocol) N.close $ \sock -> do
@@ -91,6 +89,11 @@ spec = do
 
       withListeningSocket port $
          W.connectAction "127.0.0.1" port `H.shouldReturn` True
+
+#ifdef linux_HOST_OS
+    H.it "returns false if there is a connection timeout" $ \_ -> do
+      W.connectAction "93.184.216.34" 80 `H.shouldReturn` False
+#endif
 
   H.describe "waitM" $ do
     H.it "returns immediantly if the action returns True" $
