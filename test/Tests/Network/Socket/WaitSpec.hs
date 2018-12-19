@@ -28,8 +28,8 @@ blockPort sock = E.bracket F.openFreePort (N.close . snd) $ \(port1, sock1) -> d
 testAtFirstUnavailable :: String -> (IO () -> Int -> IO ()) -> H.SpecWith (Int, N.Socket)
 testAtFirstUnavailable message test = H.describe (message ++ " when the port is") $ do
    H.it "free" $ \(port, sock) -> N.close sock >> test (pure ()) port
-   H.it "bound but not in a TCP state" $ \(port, sock) -> test (N.close sock) port
-   H.it "in a state other than listening" $ \(port, sock) ->
+   H.it "is bound and CLOSED" $ \(port, sock) -> test (N.close sock) port
+   H.it "is in a state other than listening" $ \(port, sock) ->
      A.withAsync (blockPort sock) $ \thread -> test (A.cancel thread >> N.close sock) port
 
 testUnavailable :: String -> (Int -> IO ()) -> H.SpecWith (Int, N.Socket)
