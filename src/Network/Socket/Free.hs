@@ -29,7 +29,7 @@ openFreePort =
 --   It's possible to get a free port only for it to
 --   be bound by some other process or thread before used
 --
---   Since 0.2.0.1
+--   Since 0.2.1
 getFreePort :: IO Int
 getFreePort = do
   (port, socket) <- openFreePort
