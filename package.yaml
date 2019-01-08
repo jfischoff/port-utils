@@ -1,5 +1,5 @@
 name:                port-utils
-version:             0.2.0.0
+version:             0.2.1
 github: jfischoff/port-utils
 license:             BSD3
 author:              "Jonathan Fischoff"
