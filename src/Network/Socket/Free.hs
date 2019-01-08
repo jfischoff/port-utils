@@ -21,3 +21,17 @@ openFreePort =
             )
             Nothing
             Nothing
+
+-- | Open a TCP socket, get its port and close the socket.  
+--   Useful when you have an external service that needs a fresh port.
+--
+--   There is a small race condition present:
+--   It's possible to get a free port only for it to
+--   be bound by some other process or thread before used
+--
+--   Since 0.0.0.2
+getFreePort :: IO Int
+getFreePort = do
+  (port, socket) <- openFreePort
+  N.close socket
+  pure port
