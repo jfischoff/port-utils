@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5f881948035b26d5de5a9e7329160404eb5eae54ace0a3b7726b133907d0ba35
+-- hash: bf4437486b1e510a93aa2322ff767ba0738b434318c7327c3ca8df12f494979f
 
 name:           port-utils
-version:        0.2.0.0
+version:        0.2.1
 synopsis:       Utilities for creating and waiting on ports
 description:    Utilities for creating and waiting on ports. . @openFreePort@ will create a socket bound to a random port (like @warp@'s @openFreePort@). . @wait@ will attempt to connect to given host and port repeatedly until successful. .
 homepage:       https://github.com/jfischoff/port-utils#readme
