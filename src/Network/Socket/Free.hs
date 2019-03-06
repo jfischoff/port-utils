@@ -1,4 +1,4 @@
-module Network.Socket.Free (openFreePort) where
+module Network.Socket.Free (openFreePort, getFreePort) where
 import qualified Network.Socket as N
 import qualified Control.Exception as E
 import qualified System.IO.Error as Error
@@ -22,7 +22,7 @@ openFreePort =
             Nothing
             Nothing
 
--- | Open a TCP socket, get its port and close the socket.  
+-- | Open a TCP socket, get its port and close the socket.
 --   Useful when you have an external service that needs a fresh port.
 --
 --   There is a small race condition present:
